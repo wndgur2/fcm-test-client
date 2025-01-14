@@ -37,7 +37,7 @@ function App() {
 
   return (
     <div>
-      <h1>hello world!</h1>
+      <h1>NO IOS!</h1>
       <p>{token}</p>
       <button onClick={copyToken}>copy to clipboard</button>
     </div>
