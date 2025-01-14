@@ -1,45 +1,28 @@
-import initializeFCM from './util/notification/initializeFCM'
-import { useEffect, useState } from 'react'
+import { QueryClient, useQuery } from '@tanstack/react-query'
+import { setToken } from './util/notification/initializeFCM'
+import { useEffect } from 'react'
+import { broadcast, registFCMToken } from './api/fcm'
 
 function App() {
-  const [token, setToken] = useState()
+  const queryClient = new QueryClient()
+
+  const query = useQuery({
+    queryKey: ['fcmToken'],
+    queryFn: setToken,
+  })
 
   useEffect(() => {
-    if (!('Notification' in window)) {
-      console.log('This browser does not support notifications.')
-      return
-    }
-
-    if (Notification.permission === 'granted') {
-      initializeFCM().then((token) => {
-        setToken(token)
-      })
-      return
-    } else {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          console.log('Notification permission granted.')
-          initializeFCM().then((token) => {
-            setToken(token)
-          })
-        }
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    console.log(token)
-  }, [token])
-
-  const copyToken = () => {
-    navigator.clipboard.writeText(token)
-  }
+    if (!query.data) return
+    registFCMToken(query.data).then((res) => {
+      console.log('res:', res)
+    })
+  }, [query.data])
 
   return (
     <div>
-      <h1>NO IOS!</h1>
-      <p>{token}</p>
-      <button onClick={copyToken}>copy to clipboard</button>
+      <h1>Hello android!</h1>
+      <p>{query.data}</p>
+      <button onClick={broadcast}>BROADCAST</button>
     </div>
   )
 }

@@ -2,7 +2,9 @@
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 
-export default function initializeFCM() {
+export function setToken() {
+  console.log('setToken')
+
   const firebaseConfig = {
     apiKey: 'AIzaSyA3jZLbjGiFKkW5ziiyLsufgAHyBab-B6Y',
     authDomain: 'heycheese-6b35b.firebaseapp.com',
@@ -17,8 +19,25 @@ export default function initializeFCM() {
 
   const messaging = getMessaging(app)
 
-  return getToken(messaging, {
-    vapidKey:
-      'BO49DPqakZEYf1Ln7OebK-CTh1sN9rleZ_BIGrUxlJOdLsj4KZjtvdayVzF1Sd2FPtjJPW2rcyQOY_OonYZf86c',
-  })
+  if (!('Notification' in window)) {
+    console.log('This browser does not support notifications.')
+    return
+  }
+
+  if (Notification.permission === 'granted') {
+    return getToken(messaging, {
+      vapidKey:
+        'BO49DPqakZEYf1Ln7OebK-CTh1sN9rleZ_BIGrUxlJOdLsj4KZjtvdayVzF1Sd2FPtjJPW2rcyQOY_OonYZf86c',
+    })
+  } else {
+    Notification.requestPermission().then((permission) => {
+      if (permission === 'granted') {
+        console.log('Notification permission granted.')
+        return getToken(messaging, {
+          vapidKey:
+            'BO49DPqakZEYf1Ln7OebK-CTh1sN9rleZ_BIGrUxlJOdLsj4KZjtvdayVzF1Sd2FPtjJPW2rcyQOY_OonYZf86c',
+        })
+      }
+    })
+  }
 }

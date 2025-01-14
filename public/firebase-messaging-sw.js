@@ -24,7 +24,7 @@ messaging.onMessage((payload) => {
 messaging.onBackgroundMessage((payload) => {
   console.log('Received a bg message: ', payload)
 
-  const title = payload.notification.title
+  const title = payload.data.title
   const notification = {
     body: 'Notification Body',
     icon: '/icon.png',
