@@ -2,17 +2,29 @@ import initializeFCM from './util/notification/initializeFCM'
 import { useEffect, useState } from 'react'
 
 function App() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState()
 
   useEffect(() => {
-    Notification.requestPermission().then((permission) => {
-      if (permission === 'granted') {
-        console.log('Notification permission granted.')
-        initializeFCM().then((token) => {
-          setToken(token)
-        })
-      }
-    })
+    if (!('Notification' in window)) {
+      console.log('This browser does not support notifications.')
+      return
+    }
+
+    if (Notification.permission === 'granted') {
+      initializeFCM().then((token) => {
+        setToken(token)
+      })
+      return
+    } else {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.')
+          initializeFCM().then((token) => {
+            setToken(token)
+          })
+        }
+      })
+    }
   }, [])
 
   useEffect(() => {
@@ -22,10 +34,11 @@ function App() {
   const copyToken = () => {
     navigator.clipboard.writeText(token)
   }
+
   return (
     <div>
       <h1>hello world!</h1>
-      <span>{token}</span>
+      <p>{token}</p>
       <button onClick={copyToken}>copy to clipboard</button>
     </div>
   )
